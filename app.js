@@ -13,6 +13,7 @@ const ExpressError = require("./utils/ExpressError.js");
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const SQLiteStore = require('connect-sqlite3')(session);
 require('./models/associations.js');
 
 // SQLite imports
@@ -21,9 +22,19 @@ const User = require("./models/user.js");
 const Listing = require("./models/listing.js"); // Add this import
 
 const sessionOptions = {
-  secret: "mysupersecretstring",
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
+   store: new SQLiteStore({ // Add this store configuration
+    db: 'sessions.sqlite',
+    dir: './',
+    table: 'sessions'
+  }),
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
 };
 
 const listingRouter = require("./routes/listing.js");
