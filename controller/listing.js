@@ -1,6 +1,7 @@
 const { Listing, Review, User } = require("../models/associations");
 
 module.exports.index = async (req, res) => {
+  console.log('=== DEBUG: Fetching ALL listings ===');
   const alllistings = await Listing.findAll({
     include: [
       {
@@ -10,6 +11,17 @@ module.exports.index = async (req, res) => {
       }
     ]
   });
+  
+  // DEBUG: Log all listings
+  console.log(`=== Found ${alllistings.length} listings ===`);
+  alllistings.forEach((listing, i) => {
+    console.log(`[${i}] ID: ${listing.id}, Title: "${listing.title}"`);
+    console.log(`     Description: "${listing.description?.substring(0, 50)}..."`);
+    console.log(`     Location: ${listing.location}, Price: ${listing.price}`);
+    console.log(`     Owner: ${listing.owner?.username}`);
+    console.log('---');
+  });
+  
   res.render("listings/index.ejs", { alllistings });
 };
 

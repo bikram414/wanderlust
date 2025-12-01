@@ -45,7 +45,7 @@ const userRouter = require("./routes/user.js");
 sequelize.authenticate()
   .then(() => {
     console.log('SQLite connected successfully');
-    return sequelize.sync({ force: false }); // Set force: true only if you want to reset database
+    return sequelize.sync({ force: true }); // ← This will RESET database // Set force: true only if you want to reset database
   })
   .then(() => {
     console.log('Database synced');
