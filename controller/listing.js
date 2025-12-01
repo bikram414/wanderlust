@@ -1,11 +1,9 @@
 const { Listing, Review, User } = require("../models/associations");
 
 module.exports.index = async (req, res) => {
-  console.log('=== 🔍 ULTRA DEBUG: Checking ALL database data ===');
-  console.log('Time:', new Date().toISOString());
+  console.log('=== 🔍 DEBUG: Starting index ===');
   
   try {
-    // 1. Get ALL listings with ALL fields
     const alllistings = await Listing.findAll({
       include: [
         {
@@ -16,49 +14,23 @@ module.exports.index = async (req, res) => {
       ]
     });
     
-    console.log(`=== 📊 TOTAL LISTINGS FOUND: ${alllistings.length} ===`);
+    console.log(`Found ${alllistings.length} listings`);
     
-    if (alllistings.length === 0) {
-      console.log('❌ NO LISTINGS IN DATABASE!');
-    } else {
-      // 2. Log EVERY field of EVERY listing
-      alllistings.forEach((listing, i) => {
-        console.log(`\n=== 🏠 LISTING ${i + 1}/${alllistings.length} ===`);
-        console.log('📌 ID:', listing.id);
-        console.log('🏷️ Title:', listing.title);
-        console.log('📝 Description:', listing.description);
-        console.log('📍 Location:', listing.location);
-        console.log('🇺🇸 Country:', listing.country);
-        console.log('💰 Price:', listing.price);
-        console.log('👤 Owner:', listing.owner?.username);
-        console.log('🖼️ Image URL:', listing.image?.url);
-        console.log('📅 Created:', listing.createdAt);
-        
-        // Check for the mysterious text
-        const fullText = JSON.stringify(listing.toJSON()).toLowerCase();
-        if (fullText.includes('search') || fullText.includes('option') || fullText.includes('session')) {
-          console.log('🚨🚨🚨 FOUND SUSPICIOUS TEXT IN THIS LISTING! 🚨🚨🚨');
-          console.log('Full data:', JSON.stringify(listing.toJSON(), null, 2));
-        }
-      });
-    }
-    
-    // 3. Also check users table
-    const allUsers = await User.findAll();
-    console.log(`\n=== 👥 TOTAL USERS: ${allUsers.length} ===`);
-    allUsers.forEach(user => {
-      console.log(`User: ${user.username} (${user.email})`);
+    // SAFE logging - no .toJSON() calls
+    alllistings.forEach((listing, i) => {
+      console.log(`[${i}] ID: ${listing.id}, Title: "${listing.title}"`);
     });
     
-    console.log('\n=== 🎬 RENDERING TEMPLATE ===');
     res.render("listings/index.ejs", { alllistings });
     
   } catch (error) {
-    console.log('❌ DATABASE ERROR:', error);
-    res.status(500).send('Database error: ' + error.message);
+    console.log('❌ ERROR in index:', error.message);
+    console.log('Stack:', error.stack);
+    res.status(500).send('Server error: ' + error.message);
   }
 };
 
+// KEEP ALL OTHER FUNCTIONS THE SAME AS BEFORE
 module.exports.renderNewForm = (req, res) => {
   res.render("listings/new.ejs");
 };
